@@ -13,6 +13,7 @@
 {
     CGPoint beginPoint;
     RefreshBlock _refreshBlock;
+    UIPanGestureRecognizer *_pan;
 }
 
 - (void)awakeFromNib {
@@ -35,13 +36,13 @@
     
   
     //.平移手势
-    UIPanGestureRecognizer *pan = [[UIPanGestureRecognizer alloc]initWithTarget:self action:@selector(panAct:)];
-    pan.delegate = self;
+    _pan = [[UIPanGestureRecognizer alloc]initWithTarget:self action:@selector(panAct:)];
+    _pan.delegate = self;
 
-    pan.delaysTouchesBegan = YES;
+    _pan.delaysTouchesBegan = YES;
 
     //添加平移手势
-    [self.contentView addGestureRecognizer:pan];
+    [self.contentView addGestureRecognizer:_pan];
     _isSlided = NO;
 }
 
@@ -112,6 +113,18 @@
 - (void)methodForRefresh:(RefreshBlock)refreshBlock{
     _refreshBlock = refreshBlock;
 }
+
+
+#pragma mark - gestureRecognizer delegate
+
+- (BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldRecognizeSimultaneouslyWithGestureRecognizer:(UIGestureRecognizer *)otherGestureRecognizer
+{
+    if (self.contentView.left <= -2 && otherGestureRecognizer != _pan) {
+        return NO;
+    }
+    return YES;
+}
+
 
 - (void)setSelected:(BOOL)selected animated:(BOOL)animated {
     [super setSelected:selected animated:animated];
